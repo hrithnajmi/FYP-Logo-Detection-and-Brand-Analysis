@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Detection and Brand Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: orange;
+            padding: 15px;
+            color: white;
+            text-align: left;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .ui.form .field label {
+            color: #333;
+        }
+
+        .ui.primary.button {
+            background-color: orange;
+            border-color: orange;
+        }
+
+        .ui.primary.button:hover {
+            background-color: #e69500;
+            border-color: #e69500;
+        }
+
+        .ui.message {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        Logo Detection and Brand Analysis
+    </div>
+    <div class="ui container">
+        <h2 class="ui header">Upload and Analyze Video</h2>
+        <form class="ui form" id="uploadForm" enctype="multipart/form-data">
+            <div class="field">
+                <label for="file">Upload Video</label>
+                <input type="file" name="file" id="file" accept="video/*" required>
+            </div>
+            <div class="field">
+                <label for="model">Choose Model</label>
+                <select name="model" id="model" class="ui dropdown" required>
+                    <option value="">Select a model</option>
+                    <option value="apple">Apple Logo</option>
+                    <option value="cocacola">CocaCola Logo</option>
+                </select>
+            </div>
+            <button class="ui primary button" type="submit">Upload</button>
+        </form>
+        <div id="output" class="ui message hidden"></div>
+        <form class="ui form hidden" id="analyticsForm">
+            <button id="generateAnalyticsButton" class="ui primary button" type="button" style="margin-top: 20px;">Generate Analytics</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const form = event.target;
+            const formData = new FormData(form);
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            const output = document.getElementById('output');
+            const analyticsForm = document.getElementById('analyticsForm');
+    
+            output.classList.add('hidden');
+            analyticsForm.classList.add('hidden');
+    
+            if (file) {
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        output.classList.remove('hidden');
+                        output.classList.add('negative');
+                        output.textContent = data.error;
+                    } else {
+                        analyticsForm.classList.remove('hidden');
+    
+                        output.classList.remove('hidden');
+                        output.classList.add('positive');
+                        output.innerHTML = `<p>Video uploaded and processed successfully.</p><p>Model selected: ${data.model}</p><p>Video saved at: ${data.path}</p><p>CSV is at: ${data.csv_path}</p>`;
+
+                        document.getElementById('generateAnalyticsButton').addEventListener('click', function() {
+                        // Redirect to charts with csv_path
+                        window.location.href = data.redirect_url;
+                        });
+                    
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    output.classList.remove('hidden');
+                    output.classList.add('negative');
+                    output.textContent = 'An error occurred during the upload process.';
+                });
+            }
+        });
+    
+    </script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Charts</title>
+    <style>
+        /* Resetting default margin for body */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px; /* Adjust gap between items */
+            padding: 20px; /* Add padding for better spacing */
+            margin-top: 20px; /* Add margin to create space with the navbar */
+        }
+        .chart-item {
+            border: 1px solid #ddd;
+            padding: 20px;
+            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .chart-item:hover {
+            transform: scale(1.02);
+        }
+        .chart-item img {
+            max-width: 100%; /* Ensure images do not exceed their container's width */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Remove any extra spacing */
+            margin: 0 auto; /* Center the image horizontally */
+        }
+        .navbar {
+            background-color: orange;
+            padding: 15px;
+            color: white;
+            text-align: left;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0; /* Remove default margin */
+        }
+        .button {
+            background-color: orange; /* orange */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: rgb(226, 148, 3);
+        }
+        #roi-section {
+            display: none;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            max-width: 400px;
+        }
+        #roi-section h3 {
+            margin-top: 0;
+        }
+        #roi-section input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: calc(100% - 20px);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #roi-result {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+    <script>
+        function toggleROISection() {
+            var roiSection = document.getElementById('roi-section');
+            if (roiSection.style.display === 'none') {
+                roiSection.style.display = 'block';
+            } else {
+                roiSection.style.display = 'none';
+            }
+        }
+
+        function calculateROI() {
+            var salesBefore = parseFloat(document.getElementById('sales-before').value);
+            var salesAfter = parseFloat(document.getElementById('sales-after').value);
+            var adBudget = parseFloat(document.getElementById('ad-budget').value);
+            if (isNaN(salesBefore) || isNaN(salesAfter) || isNaN(adBudget) || adBudget <= 0) {
+                alert('Please enter valid numbers for sales and budget.');
+                return;
+            }
+            var roi = ((salesAfter - salesBefore) / adBudget) * 100;
+            document.getElementById('roi-result').innerText = 'ROI: ' + roi.toFixed(2) + '%';
+        }
+    </script>
+</head>
+<body>
+    <h2 class="navbar">Analytics Charts</h2>
+    
+    <button class="button" onclick="toggleROISection()">Calculate ROI</button>
+    
+    <div id="roi-section">
+        <h3>Calculate ROI</h3>
+        <label for="sales-before">Sales Before Video:</label>
+        <input type="number" id="sales-before" name="sales-before" step="0.01"><br>
+        <label for="sales-after">Sales After Video:</label>
+        <input type="number" id="sales-after" name="sales-after" step="0.01"><br>
+        <label for="ad-budget">Video Advertisement Budget:</label>
+        <input type="number" id="ad-budget" name="ad-budget" step="0.01"><br>
+        <button class="button" onclick="calculateROI()">Calculate</button>
+        <p id="roi-result"></p>
+    </div>
+    
+    <div class="grid-container">
+        <div class="chart-item">
+            <img src="{{ url_for('result_file', filename=csv_dir + '/confidence_distribution.png') }}" alt="Distribution of Confidence Values">
+        </div>
+        
+        <div class="chart-item">
+            <img src="{{ url_for('result_file', filename=csv_dir + '/duration_analysis.png') }}" alt="Duration Analysis">
+        </div>
+        
+        <div class="chart-item">
+            <img src="{{ url_for('result_file', filename=csv_dir + '/percentage_duration.png') }}" alt="Percentage of Duration for Detected Logos">
+        </div>
+        
+        <div class="chart-item">
+            <img src="{{ url_for('result_file', filename=csv_dir + '/average_confidence.png') }}" alt="Average Confidence per Class">
+        </div>
+    </div>
+</body>
+</html>
